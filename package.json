@@ -19,5 +19,17 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.0"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      "node_modules/**/node_modules"
+    ],
+    "delay": "2500",
+    "env": {
+      "MONGO_DB_USER": "mongo-atlas-admin-3948",
+      "MONGO_DB_PASSWORD": "Db@$9Z0CKv^!j626**@0FzfQ3%qo0!v9&1YiE4Lxw6Ldl2^$*r",
+      "MONGO_DB_NAME": "events-react-dev"
+    }
   }
 }
