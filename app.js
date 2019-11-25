@@ -15,6 +15,16 @@ const app = express();
 app.use(bodyParser.json());
 app.use(isAuth);
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type', 'Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 app.use('/graphql', graphQlHttp({
     schema: graphQlSchema,
     rootValue: graphQlResolvers,
@@ -26,7 +36,7 @@ const encodedPassword = encodeURI(process.env.MONGO_DB_PASSWORD);
 const MONGO_URL = `mongodb+srv://${encodedUser}:${encodedPassword}@testing-graphql-event-p1usm.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`;
 mongoose.connect(MONGO_URL, { useNewUrlParser: true })
     .then(() => {
-        app.listen(3000);
+        app.listen(8000);
     }).catch(err => {
         console.log(err);
     });
