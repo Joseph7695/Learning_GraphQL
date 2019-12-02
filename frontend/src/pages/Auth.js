@@ -1,12 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Component } from 'react';
 
 import './Auth.css';
-import { isCompositeType } from 'graphql';
+import AuthContext from "../context/auth-context";
 
-class AuthPage extends Component {
+class AuthPage extends React.Component {
     state = {
         isLogin: true
     };
+
+    static contextType = AuthContext;
 
     constructor(props) {
         super(props);
@@ -28,6 +31,8 @@ class AuthPage extends Component {
         if (email.trim().length === 0 || password.trim().length === 0) {
             return;
         }
+
+        console.log(email, password);
         let requestBody = {
             query: `
                 query{
@@ -63,16 +68,24 @@ class AuthPage extends Component {
             if (res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!');
             }
+            console.log("Login success");
             return res.json();
         }).then(resData => {
-            console.log(resDat);
+            if (resData.data.login.token) {
+                console.log(resData.data.login.token);
+                this.context.login(
+                    resData.data.login.token,
+                    resData.data.login.userId,
+                    resData.data.login.tokenExpiration
+                );
+            }
         }).catch(err => {
             console.log(err)
         });
     };
 
     render() {
-        return <form className="auth-form">
+        return <form className="auth-form" onSubmit={this.submitHandler}>
             <div className="form-control">
                 <label htmlFor="email">E-Mail</label>
                 <input ref={this.emailEl} type="email" id="email" />

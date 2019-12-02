@@ -7,11 +7,11 @@ module.exports = (req, res, next) => {
     if (!token || token === '') { req.isAuth = false; return next(); }
     try {
         const decodedToken = jwt.verify(token, 'somesupersecretkey');
+        if (!decodedToken) { req.isAuth = false; return next(); }
+        req.isAuth = true;
+        req.userId = decodedToken.userId;
+        next();
     } catch (error) {
         { req.isAuth = false; return next(); }
     }
-    if (!decodedToken) { req.isAuth = false; return next(); }
-    req.isAuth = true;
-    req.userId = decodedToken.userId;
-    next();
 }
