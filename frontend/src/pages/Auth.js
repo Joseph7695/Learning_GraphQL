@@ -1,5 +1,4 @@
 import React from 'react';
-import { Component } from 'react';
 
 import './Auth.css';
 import AuthContext from "../context/auth-context";
@@ -48,14 +47,14 @@ class AuthPage extends React.Component {
         if (!this.state.isLogin) {
             requestBody = {
                 query: `
-            mutation {
-                createUser(userInput: {
-                    email: "${email}", password, "${password}"
-                }) {
-                    _id
-                    email
-                }
-            }`};
+                    mutation{
+                        createUser(userInput: { email: "${email}", password: "${password}" }) {
+                            _id
+                            email
+                        }
+                    }
+                `
+            };
         }
 
         fetch('http://localhost:8000/graphql', {
@@ -68,11 +67,9 @@ class AuthPage extends React.Component {
             if (res.status !== 200 && res.status !== 201) {
                 throw new Error('Failed!');
             }
-            console.log("Login success");
             return res.json();
         }).then(resData => {
             if (resData.data.login.token) {
-                console.log(resData.data.login.token);
                 this.context.login(
                     resData.data.login.token,
                     resData.data.login.userId,

@@ -19,6 +19,7 @@ class EventsPage extends Component {
     };
 
     static contextType = AuthContext;
+    isActive = true;
 
     constructor(props) {
         super(props);
@@ -110,9 +111,6 @@ class EventsPage extends Component {
                 }
             `
         };
-
-        const token = this.context.token;
-
         fetch('http://localhost:8000/graphql', {
             method: 'POST',
             body: JSON.stringify(requestBody),
@@ -139,6 +137,49 @@ class EventsPage extends Component {
             const selectedEvent = prevState.events.find(e => e._id === eventId);
             return { selectedEvent: selectedEvent };
         });
+    }
+
+    bookEventHandler = () => {
+        if (!this.context.token) { this.setState({ selectedEvent: null }); return; }
+        const requestBody = {
+            query: `
+                mutation{
+                    bookEvent(eventId: "${this.state.selectedEvent._id}"){
+                        _id createdAt updatedAt
+                    }
+                }
+            `
+        };
+
+        const token = this.context.token;
+
+        fetch('http://localhost:8000/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => {
+            if (res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed!');
+            }
+            return res.json();
+        }).then(resData => {
+            if (this.isActive) {
+                this.setState({ selectedEvent: null });
+                console.log(resData);
+            }
+        }).catch(err => {
+            if (this.isActive) {
+                this.setState({ isloading: false });
+            }
+            console.log(err);
+        });
+    }
+
+    componentWillUnmount() {
+        this.isActive = false;
     }
 
     render() {
@@ -178,7 +219,7 @@ class EventsPage extends Component {
                         canConfirm
                         onCancel={this.modalCancelHandler}
                         onConfirm={this.bookEventHandler}
-                        confirmText="Book">
+                        confirmText={this.context.token ? "Book" : "Confirm"}>
 
                         <h1>{this.state.selectedEvent.title}</h1>
                         <h2>
@@ -196,7 +237,7 @@ class EventsPage extends Component {
                     (<EventList
                         events={this.state.events}
                         authUserId={this.context.userId}
-                        onNewDetail={this.showDetailHandler}
+                        onViewDetail={this.showDetailHandler}
                     />)}
             </React.Fragment >)
     }
