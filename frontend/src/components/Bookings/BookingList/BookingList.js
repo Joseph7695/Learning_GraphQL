@@ -2,7 +2,7 @@ import React from 'react';
 
 import './BookingList.css'
 
-const bookingList = props => (
+const BookingList = props => (
     <ul className="bookings__list">
         {props.bookings.map(booking => {
             return (
@@ -20,4 +20,4 @@ const bookingList = props => (
     </ul >
 );
 
-export default bookingList;
+export default BookingList;
